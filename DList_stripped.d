@@ -41,16 +41,16 @@ class DList(T) {
     }
 
     /++
-     Adds an element in the tail of the list
+     Adds an element at the tail of the list
      +/
     void unshift(T v) nothrow {
         // ... Implementation missing
     }
 
     /++
-     Removes the element in the header of the list
+     Removes the header element from the list
      Returns:
-     Header element
+     The header element
      +/
     Result pop() nothrow {
         // ... Implementation missing
@@ -58,9 +58,9 @@ class DList(T) {
 
 
     /++
-     Removes the element in the header of the list
+     Removes the tail from the list
      Returns:
-     Header element
+     The tail element
      +/
     Result shift() nothrow {
         // ... Implementation missing
@@ -87,7 +87,8 @@ class DList(T) {
     }
 
     /++
-     Search template find v in the list and calls do_func on the found element
+     Search template.
+     Find v in the list and calls do_func on the found element
      +/
     Result Search(alias do_func)(T v) nothrow if (isCallable!do_func) {
         for(Element iter=head; iter !is null; iter=iter.next) {
@@ -98,7 +99,8 @@ class DList(T) {
         return Empty;
     }
     /++
-     Replace template find dest in the list and calls do_func on the found element with the src parameter
+     Replace template
+     Find dest in the list and calls do_func on the found element with the src parameter
      +/
 
     Result Replace(alias do_func)(T dest, const T src) nothrow if (isCallable!do_func) {
@@ -119,6 +121,9 @@ class DList(T) {
         return Search!remove(v);
     }
 
+    /++
+     Replace value at element
+     +/
     protected Element replace(Element element, T v) nothrow {
        // ... Implementation missing
     }
@@ -516,8 +521,9 @@ unittest {
             assert(r.back.before.value == "");
         }
 
-        { // replace
-            auto list=new DList!string;
+
+        void replace_test(T)() { // replace
+            auto list=new DList!T;
             strings.each!(a => list.unshift(a));
             auto results=strings.dup;
 
@@ -571,6 +577,10 @@ unittest {
                 assert(result.value == results[2]);
             }
         }
+
+        replace_test!string;
+        replace_test!(immutable(string));
+
 
         { // Insert before
             auto list=new DList!string;
