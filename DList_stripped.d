@@ -37,14 +37,34 @@ class DList(T) {
      Adds an element in the header of the list
      +/
     void push(T e) nothrow {
-        // ... Implementation missing
+        Element tmp  = new Element(head, tail, e);
+        tmp.previous = null; 
+        tmp.next     = head;
+       
+        if( head.after().Yes.Dlist )
+        head.previuos = tmp;
+              
+        if( length() == 0 )
+            head = tail = tmp;
+        else
+            head = tmp; 
     }
 
     /++
      Adds an element at the tail of the list
      +/
     void unshift(T v) nothrow {
-        // ... Implementation missing
+        Element tmp  = new Element( head, tail, v );
+        tmp.next     = null;
+        tmp.previous = tail;
+        
+        if( tail.before().Yes.Dlist )
+            tail.next = tmp;
+        
+        if( length() == 0 )
+            head = tail = tmp;
+        else
+            tail = tmp;   
     }
 
     /++
@@ -53,7 +73,12 @@ class DList(T) {
      The header element
      +/
     Result pop() nothrow {
-        // ... Implementation missing
+        Element pop      = head;     
+        Element pop_next = pop.next; 
+                head     = pop_next;
+        T       pop_val  = pop.value;       
+        destroy( pop );
+        return Result( pop_val, Yes.DList );  
     }
 
 
@@ -63,7 +88,12 @@ class DList(T) {
      The tail element
      +/
     Result shift() nothrow {
-        // ... Implementation missing
+        Element shift      = tail;     
+        Element shift_prev = shift.previous;
+                tail       = shift_prev;
+        T shift_val = shift.value;             
+        destroy( shift );
+        return Result( shift_val, Yes.DList );   
     }
 
     invariant {
@@ -83,7 +113,20 @@ class DList(T) {
             assert(element !is null);
         }
     do {
-       // ... Implementation missing        
+       Element del       = new Element(element.previous, element.next, element.value );
+       Element del_prev  = element.previous; 
+       Element del_after = element.next;
+      
+       if( del_prev !is null && length() != 1 )
+           del_prev.next = del_after;
+       if( del_after !is null && length() != 1)     
+           del_after.previous = del_prev;
+       if( del_prev is null )
+           head = del_after;
+       if( del_after is null )
+           tail = del_prev;
+       destroy element;
+       return del.value;          
     }
 
     /++
@@ -125,7 +168,12 @@ class DList(T) {
      Replace value at element
      +/
     protected Element replace(Element element, T v) nothrow {
-       // ... Implementation missing
+       for( Element iter=head; iter !is null; iter=iter.next ) {
+             if( iter.value == element.value ) {
+                 iter.value = v;
+                 break;
+             }
+       return iter;   
     }
 
     /+
@@ -140,14 +188,46 @@ class DList(T) {
      Insert v after element
      +/
     protected Element insert_before(Element element, T v) nothrow {
-       // ... Implementation missing
+       size_t index = 0;
+       for( Element iter = head; iter !is null; iter = iter.next ) {
+            if( iter !is element) { 
+                index ++;
+                continue;
+            }
+            else break;
+       }
+       if( index is length() ) 
+           return new Element( element.previous, element.next, T.init );
+       if( element.next is null) 
+           unshift( v );
+       
+       Element tmp = new Element ( element, element.next, v );
+       element.next.previous = tmp;
+       element.next = tmp;
+       return tmp;   
      }
 
     /++
      Insert v before element
      +/
     protected Element insert_after(Element element, T v) nothrow {
-       // ... Implementation missing
+       size_t index = 0;
+       for( Element iter = head; iter !is null; iter = iter.next ) {
+            if( iter !is element) { 
+                index ++;
+                continue;
+            }
+            else break;
+       }
+       if( index is length() ) 
+           return new Element( element.previous, element.next, T.init );
+       if( element.previous is null) 
+           push( v );
+           
+       Element tmp = new Element(element.previous, element, v);
+       element.previous.next = tmp;
+       element.previous = tmp;
+       return tmp;
     }
 
     /++
